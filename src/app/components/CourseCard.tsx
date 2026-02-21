@@ -3,6 +3,7 @@ import { Course } from '../data/mockData';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Badge } from './ui/badge';
 import { Button } from './ui/button';
+import { getProxiedPlacePhotoUrl } from '../utils/photoProxy';
 
 interface CourseCardProps {
   course: Course;
@@ -18,7 +19,7 @@ export function CourseCard({ course, onCardClick, onSave, isSaved }: CourseCardP
     <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
       <div className="relative h-48 overflow-hidden cursor-pointer" onClick={() => onCardClick(course)}>
         <img 
-          src={course.image} 
+          src={getProxiedPlacePhotoUrl(course.image)}
           alt={course.name}
           className="w-full h-full object-cover"
         />

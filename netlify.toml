@@ -1,0 +1,9 @@
+[build]
+  publish = "dist"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/place-photo/*"
+  to = "/.netlify/functions/place-photo"
+  status = 200
+  force = true

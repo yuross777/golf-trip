@@ -13,6 +13,9 @@ node_modules/
 .env
 .env.development
 .env.development.local
+.env.local
+.netlify/
+.netlify/*
 # Firebase service account key
 /scripts/serviceAccountKey.json
 vivek8470/

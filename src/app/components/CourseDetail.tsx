@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { toast } from 'sonner';
+import { getProxiedPlacePhotoUrl } from '../utils/photoProxy';
 
 interface CourseDetailProps {
   course: Course;
@@ -97,10 +98,10 @@ export function CourseDetail({ course, onBack, onSave, isSaved, onStartScorecard
       {/* Header Image */}
       <div className="relative h-64">
         <img 
-          src={course.image} 
-          alt={course.name}
-          className="w-full h-full object-cover"
-        />
+          src={getProxiedPlacePhotoUrl(course.image)}
+           alt={course.name}
+           className="w-full h-full object-cover"
+         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         
         {/* Header Actions */}
