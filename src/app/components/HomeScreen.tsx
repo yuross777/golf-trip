@@ -61,14 +61,14 @@ export function HomeScreen({ onCourseClick, savedCourses, onSaveCourse }: HomeSc
     // Price tier filter
     if (selectedPriceTier !== 'all') {
       filtered = filtered.filter(course =>
-        course.tags.includes(selectedPriceTier)
+        (course.tags ?? []).includes(selectedPriceTier)
       );
     }
 
     // Tags filter
     if (selectedTags.size > 0) {
       filtered = filtered.filter(course =>
-        Array.from(selectedTags).some(tag => course.tags.includes(tag))
+        Array.from(selectedTags).some(tag => (course.tags ?? []).includes(tag))
       );
     }
 
@@ -208,7 +208,7 @@ export function HomeScreen({ onCourseClick, savedCourses, onSaveCourse }: HomeSc
                 course={course}
                 onCardClick={onCourseClick}
                 onSave={onSaveCourse}
-                isSaved={savedCourses.has(course.id)}
+                isSaved={savedCourses.has(String(course.id))}
               />
             ))}
           </div>
