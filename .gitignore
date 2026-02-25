@@ -12,6 +12,11 @@ dist-ssr
 
 # Local env files (contains secrets — never commit)
 *.local
+.env.production
+
+# Firebase service account key (used for admin scripts — never commit)
+service-account.json
+*-service-account.json
 
 # Editor directories and files
 .vscode/*

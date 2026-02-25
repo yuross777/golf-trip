@@ -1,0 +1,16 @@
+{
+  "name": "golf-trip-functions",
+  "description": "Firebase Cloud Functions for Golf Trip app",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-functions": "^7.0.5"
+  },
+  "private": true
+}
