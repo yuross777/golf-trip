@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { LoginScreen } from './components/LoginScreen';
 import { TopNav } from './components/TopNav';
 import { HomeScreen } from './components/HomeScreen';
 import { CourseDetail } from './components/CourseDetail';
@@ -11,7 +13,8 @@ import { Toaster } from './components/ui/sonner';
 
 type View = 'home' | 'courseDetail' | 'scorecard' | 'challenges' | 'trips';
 
-export default function App() {
+function AppContent() {
+  const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<View>('home');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [savedCourses, setSavedCourses] = useState<Set<string>>(new Set());
@@ -65,51 +68,71 @@ export default function App() {
     setActiveTab('scorecard');
   };
 
+  if (loading) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginScreen />;
+  }
+
+  return (
+    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
+      {/* Top Navigation */}
+      <TopNav activeTab={activeTab === 'courseDetail' ? 'home' : activeTab} onTabChange={handleTabChange} />
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        {activeTab === 'home' && (
+          <HomeScreen
+            onCourseClick={handleCourseClick}
+            savedCourses={savedCourses}
+            onSaveCourse={handleSaveCourse}
+          />
+        )}
+
+        {activeTab === 'courseDetail' && selectedCourse && (
+          <CourseDetail
+            course={selectedCourse}
+            onBack={handleBackToHome}
+            onSave={handleSaveCourse}
+            isSaved={savedCourses.has(selectedCourse.id)}
+            onStartScorecard={handleStartScorecard}
+          />
+        )}
+
+        {activeTab === 'scorecard' && (
+          <ScorecardScreen
+            preselectedCourse={preselectedCourseForScorecard}
+            onClearPreselection={() => setPreselectedCourseForScorecard(null)}
+          />
+        )}
+
+        {activeTab === 'challenges' && (
+          <ChallengesScreen />
+        )}
+
+        {activeTab === 'trips' && (
+          <TripsScreen />
+        )}
+      </div>
+
+      {/* Toast Notifications */}
+      <Toaster position="top-center" />
+    </div>
+  );
+}
+
+export default function App() {
   return (
     <LanguageProvider>
-      <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
-        {/* Top Navigation */}
-        <TopNav activeTab={activeTab === 'courseDetail' ? 'home' : activeTab} onTabChange={handleTabChange} />
-
-        {/* Main Content */}
-        <div className="flex-1 overflow-hidden">
-          {activeTab === 'home' && (
-            <HomeScreen
-              onCourseClick={handleCourseClick}
-              savedCourses={savedCourses}
-              onSaveCourse={handleSaveCourse}
-            />
-          )}
-
-          {activeTab === 'courseDetail' && selectedCourse && (
-            <CourseDetail
-              course={selectedCourse}
-              onBack={handleBackToHome}
-              onSave={handleSaveCourse}
-              isSaved={savedCourses.has(selectedCourse.id)}
-              onStartScorecard={handleStartScorecard}
-            />
-          )}
-
-          {activeTab === 'scorecard' && (
-            <ScorecardScreen
-              preselectedCourse={preselectedCourseForScorecard}
-              onClearPreselection={() => setPreselectedCourseForScorecard(null)}
-            />
-          )}
-
-          {activeTab === 'challenges' && (
-            <ChallengesScreen />
-          )}
-
-          {activeTab === 'trips' && (
-            <TripsScreen />
-          )}
-        </div>
-
-        {/* Toast Notifications */}
-        <Toaster position="top-center" />
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </LanguageProvider>
   );
 }
