@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginScreen } from './components/LoginScreen';
@@ -13,8 +14,12 @@ import { Toaster } from './components/ui/sonner';
 
 type View = 'home' | 'courseDetail' | 'scorecard' | 'challenges' | 'trips';
 
+// 로그인 없이 접근 가능한 탭
+const GUEST_ALLOWED_TABS: View[] = ['home', 'courseDetail'];
+
 function AppContent() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
+  const [guestMode, setGuestMode] = useState(false);
   const [activeTab, setActiveTab] = useState<View>('home');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [savedCourses, setSavedCourses] = useState<Set<string>>(new Set());
@@ -54,18 +59,30 @@ function AppContent() {
   };
 
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab as View);
-    if (tab !== 'courseDetail') {
-      setSelectedCourse(null);
+    const view = tab as View;
+
+    // 게스트 모드에서 잠긴 탭 클릭 시
+    if (!user && guestMode && !GUEST_ALLOWED_TABS.includes(view)) {
+      toast('로그인이 필요한 서비스입니다', {
+        action: { label: '로그인', onClick: () => setGuestMode(false) },
+      });
+      return;
     }
-    if (tab !== 'scorecard') {
-      setPreselectedCourseForScorecard(null);
-    }
+
+    setActiveTab(view);
+    if (tab !== 'courseDetail') setSelectedCourse(null);
+    if (tab !== 'scorecard') setPreselectedCourseForScorecard(null);
   };
 
   const handleStartScorecard = (course: Course) => {
     setPreselectedCourseForScorecard(course);
     setActiveTab('scorecard');
+  };
+
+  // 로그아웃 — 게스트 모드도 함께 해제
+  const handleLogout = async () => {
+    setGuestMode(false);
+    if (user) await logout();
   };
 
   if (loading) {
@@ -76,14 +93,19 @@ function AppContent() {
     );
   }
 
-  if (!user) {
-    return <LoginScreen />;
+  if (!user && !guestMode) {
+    return <LoginScreen onBrowseWithoutLogin={() => setGuestMode(true)} />;
   }
 
   return (
     <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
       {/* Top Navigation */}
-      <TopNav activeTab={activeTab === 'courseDetail' ? 'home' : activeTab} onTabChange={handleTabChange} />
+      <TopNav
+        activeTab={activeTab === 'courseDetail' ? 'home' : activeTab}
+        onTabChange={handleTabChange}
+        onLogout={handleLogout}
+        isGuest={!user && guestMode}
+      />
 
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
