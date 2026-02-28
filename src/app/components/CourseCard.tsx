@@ -25,7 +25,7 @@ export function CourseCard({ course, onCardClick, onSave, isSaved }: CourseCardP
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onSave(course.id);
+            onSave(String(course.id));
           }}
           className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md hover:bg-white transition-colors"
         >
