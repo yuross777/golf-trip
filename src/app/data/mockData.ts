@@ -1,24 +1,27 @@
 export interface Course {
-  id: number;
+  id: string | number;
   name: string;
   island: 'North' | 'South';
-  place_id: string;
+  place_id?: string;
   region: string;
   address: string;
-  lat: number;
-  lng: number;
+  lat?: number;
+  lng?: number;
   phone: string;
   price_min_nzd: number;
   price_max_nzd: number;
   tags: string[];
-  opening_hours: string[];
-  google_maps_url: string;
+  opening_hours?: string[];
+  google_maps_url?: string;
   rating: number;
   review_count: number;
-  booking_url: string;
+  booking_url: string | null;
   website_url: string;
   image: string;
   description: string;
+  userAdded?: boolean;
+  addedBy?: string;
+  createdAt?: string;
 }
 
 export interface Place {

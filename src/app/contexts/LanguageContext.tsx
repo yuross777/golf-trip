@@ -74,6 +74,17 @@ const translations: Translations = {
   // Tour
   nearbyAttractions: { en: 'Nearby Attractions', ko: '근처 명소' },
   
+  // Scorecard - Driver options
+  dFairway: { en: 'Fairway',  ko: '페어웨이' },
+  dRough:   { en: 'Rough',    ko: '러프'     },
+  dHazard:  { en: 'Hazard',   ko: '해저드'   },
+  dOB:      { en: 'OB',       ko: 'OB'       },
+
+  // Scorecard - Second shot options
+  sOnGreen: { en: 'On Green', ko: '온그린'   },
+  sFairway: { en: 'Fairway',  ko: '페어웨이' },
+  sMiss:    { en: 'Miss',     ko: '미스'     },
+
   // Scorecard
   startScorecard: { en: 'Start Scorecard', ko: '스코어카드 시작' },
   viewPastRounds: { en: 'View Past Rounds', ko: '지난 라운드 보기' },

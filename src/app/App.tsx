@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -9,8 +9,10 @@ import { CourseDetail } from './components/CourseDetail';
 import { ScorecardScreen } from './components/ScorecardScreen';
 import { ChallengesScreen } from './components/ChallengesScreen';
 import { TripsScreen } from './components/TripsScreen';
-import { Course } from './data/mockData';
+import { Course, mockCourses } from './data/mockData';
 import { Toaster } from './components/ui/sonner';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 type View = 'home' | 'courseDetail' | 'scorecard' | 'challenges' | 'trips';
 
@@ -24,6 +26,9 @@ function AppContent() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [savedCourses, setSavedCourses] = useState<Set<string>>(new Set());
   const [preselectedCourseForScorecard, setPreselectedCourseForScorecard] = useState<Course | null>(null);
+  const [userCourses, setUserCourses] = useState<Course[]>([]);
+
+  const allCourses = useMemo(() => [...mockCourses, ...userCourses], [userCourses]);
 
   // Load saved courses from localStorage
   useEffect(() => {
@@ -37,6 +42,17 @@ function AppContent() {
   useEffect(() => {
     localStorage.setItem('savedCourses', JSON.stringify(Array.from(savedCourses)));
   }, [savedCourses]);
+
+  // Load user-added courses from Firestore
+  useEffect(() => {
+    const q = query(collection(db, 'courses'), orderBy('createdAt', 'desc'));
+    getDocs(q)
+      .then(snapshot => {
+        const courses = snapshot.docs.map(d => ({ ...d.data(), id: d.id } as Course));
+        setUserCourses(courses);
+      })
+      .catch(err => console.error('Failed to load user courses:', err));
+  }, []);
 
   const handleCourseClick = (course: Course) => {
     setSelectedCourse(course);
@@ -111,9 +127,11 @@ function AppContent() {
       <div className="flex-1 overflow-hidden">
         {activeTab === 'home' && (
           <HomeScreen
+            courses={allCourses}
             onCourseClick={handleCourseClick}
             savedCourses={savedCourses}
             onSaveCourse={handleSaveCourse}
+            onCourseAdded={(course) => setUserCourses(prev => [course, ...prev])}
           />
         )}
 
@@ -122,7 +140,7 @@ function AppContent() {
             course={selectedCourse}
             onBack={handleBackToHome}
             onSave={handleSaveCourse}
-            isSaved={savedCourses.has(selectedCourse.id)}
+            isSaved={savedCourses.has(String(selectedCourse.id))}
             onStartScorecard={handleStartScorecard}
           />
         )}
